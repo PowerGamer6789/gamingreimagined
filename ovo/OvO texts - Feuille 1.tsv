@@ -109,7 +109,7 @@ Old menus	Main menu	play	self explanatory	PLAY		JOUER		JOGAR		JUGAR		GIOCA
 		unlockall	Message when unlocking every level	You unlocked every level!		Tu as débloqué tous les niveaux !		Você desbloqueou todos os níveis!		¡Has desbloqueado todos los niveles!		Hai sbloccatp ogni livello!	
 		achievementunlocked		Achievement unlocked !		Succès débloqué !		Conquista desbloqueada!		Los anuncios no aparecerán en medio del juego		Obbiettivo sbloccato!	
 		skinunlocked	Tag line when unlocking a skin	Skin Unlocked !		Costume débloqué !		Nova skin desbloqueada!		¡Nueva skin desbloqueada!		Skin sbloccata!	
-		goldearned	Tag line when collecting a coin	Gold earned !		Pièce obtenue		Ganhou umas moedas!		¡Ganaste algunas monedas!		Oro ottenuto!	
+		goldearned	Tag line when collecting a coin	Coin collected!		Pièce obtenue		Ganhou umas moedas!		¡Ganaste algunas monedas!		Oro ottenuto!	
 		xgoldearned	Tag line when earnign gold	{0} Gold earned		{0} Pièces obtenues		{0} Dinheiro ganho		{0} Dinero ganado		Hai ottenuto {0} di oro	
 		locked	Locked (skin or achievement)	Locked		Verrouillé		Bloqueado		Obstruido		Bloccato	
 	Settings menu	music	self explanatory	Music		Musique		Música		Canción		Musica	
