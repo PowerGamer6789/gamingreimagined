@@ -610,7 +610,10 @@ globalThis.WebSdkWrapper = (function () {
       get sdk() {
         return null;
       },
-      scriptSrc: [],
+      scriptSrc: [
+        // "https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js",
+        // "https://www.coolmathgames.com/sites/default/files/cmg-ads.js",
+      ],
       hasAds: false,
       noInterstitial: true,
       noRewarded: true,
@@ -631,315 +634,18 @@ globalThis.WebSdkWrapper = (function () {
         return null;
       },
       scriptSrc: [
-        "https://universal.wgplayer.com/tag/?lh=%22+window.location.hostname+%22&wp=%22+window.location.pathname+%22&ws=%22+window.location.search",
+        // "https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js",
+        // "https://www.coolmathgames.com/sites/default/files/cmg-ads.js",
       ],
-      hasAds: true,
-      noInterstitial: false,
-      noRewarded: false,
-      enableOnlyInProduction: true,
+      hasAds: false,
+      noInterstitial: true,
+      noRewarded: true,
+      enableOnlyInProduction: false,
       hasBanner: false,
       implementation: {
-        // async preInit(debug = false, data) {
-        // },
-        // init() {
-        // },
-        setUpEventListeners(debug, data) {
-          window.SubmitLeaderboardScore = function (newScore) {};
-
-          window.InitExternEval = function () {
-            console.log("InitExternEval");
-
-            if (window.firstInit == undefined) {
-              window.firstInit = 1;
-            } else {
-              ExternEval();
-            }
-          };
-
-          window.TakeReward = function () {
-            console.log("TakeReward");
-
-            window.adReward = 0;
-          };
-
-          window.RewardErrorHandled = function () {
-            console.log("RewardErrorHandled");
-
-            window.rewardError = 0;
-          };
-
-          window.InitApi = function (_appId) {
-            var dateNow = new Date();
-            var secondsSinceEpoch = Math.round(dateNow.getTime() / 1000);
-
-            console.log("InitApi");
-
-            window.callTime = secondsSinceEpoch - 181;
-          };
-
-          window.ExternEval = function () {
-            console.log("ExternEval");
-
-            var dateNow = new Date();
-            var secondsSinceEpoch = Math.round(dateNow.getTime() / 1000);
-
-            if (
-              window.callTime != undefined &&
-              secondsSinceEpoch - window.callTime > 180
-            ) {
-              console.log("ExternEval 2");
-
-              window.callTime = secondsSinceEpoch;
-
-              if (typeof preroll !== "undefined") {
-                if (window[preroll.config.loaderObjectName] != undefined) {
-                  window.adRunning = 1;
-
-                  try {
-                    window[preroll.config.loaderObjectName].refetchAd(
-                      ExternEvalResumeGame
-                    );
-                  } catch (err) {
-                    console.log(err.message);
-                    ExternEvalResumeGame();
-                  }
-                }
-              }
-            }
-          };
-
-          window.ExternEvalResumeGame = function () {
-            console.log("ExternEvalResumeGame");
-
-            window.adRunning = 0;
-          };
-
-          window.PreloadRewarded = function () {
-            console.log("PreloadRewarded");
-
-            if (window.rewardedCallbacks == undefined) {
-              window.rewardedCallbacks = true;
-
-              try {
-                window[
-                  window.preroll.config.loaderObjectName
-                ].registerRewardCallbacks({
-                  onReady: RewardedReady,
-                  onSuccess: RewardedSuccess,
-                  onFail: RewardedFail,
-                });
-              } catch (err) {
-                console.log(err.message);
-              }
-            }
-          };
-
-          window.ShowRewarded = function () {
-            console.log("ShowRewarded");
-
-            if (typeof preroll !== "undefined") {
-              if (window[preroll.config.loaderObjectName] != undefined) {
-                window.canReward = 0;
-                window.adRunning = 1;
-
-                try {
-                  window[preroll.config.loaderObjectName].showRewardAd();
-                } catch (err) {
-                  console.log(err.message);
-                  window.adRunning = 0;
-                }
-              }
-            }
-          };
-
-          window.RewardedReady = function () {
-            console.log("RewardedReady");
-
-            if (window.rewardedCount == undefined) {
-              window.rewardedCount = 1;
-              window.canReward = 1;
-            } else {
-              window.rewardedCount = window.rewardedCount + 1;
-              setTimeout(function () {
-                window.canReward = 1;
-              }, 30000);
-            }
-          };
-
-          window.RewardedSuccess = function () {
-            console.log("RewardedSuccess");
-            window.adRunning = 0;
-            window.adReward = 1;
-
-            // Resume the game and sound here
-            if (sdkContext.lastRequestedAd === "interstitial")
-              dispatch("interstitialEnd", true);
-            else dispatch("rewardedEnd", true);
-          };
-
-          window.RewardedFail = function () {
-            console.log("RewardedFail");
-            window.adRunning = 0;
-
-            // Resume the game and sound here
-            if (sdkContext.lastRequestedAd === "interstitial")
-              dispatch("interstitialEnd", true);
-            else dispatch("rewardedEnd", false);
-          };
-
-          window.OpenLink = function () {};
-
-          window.adRunning = 0;
-          window.adRunningRewarded = 0;
-          window.adReward = 0;
-          window.rewardError = 0;
-          window.canReward = 0;
-
-          window.callTime = 0;
-          window.adPlatform = 4;
-          window.myLeaderboardScore = 0;
-          window.gameLang = "en";
-
-          window.InitApi(data.freezeNovaId || 0);
-
-          listen("interstitial", () => {
-            window.PreloadRewarded();
-            dispatch("adStarted", sdkContext.lastRequestedAd);
-            window.ShowRewarded();
-          });
-          listen("rewarded", () => {
-            window.PreloadRewarded();
-            dispatch("adStarted", sdkContext.lastRequestedAd);
-            window.ShowRewarded();
-          });
-        },
-        hasAdblock() {
-          return false;
-        },
-      },
-    },
-    {
-      name: "Xiaomi",
-      get sdk() {
-        return null;
-      },
-      scriptSrc: null,
-      hasAds: true,
-      noInterstitial: false,
-      noRewarded: false,
-      enableOnlyInProduction: true,
-      hasBanner: false,
-      implementation: {
-        async preInit(debug = false, data) {
-          // Create the first script tag with async attributes and other specified properties
-          var script = document.createElement("script");
-          script.async = true;
-          script.setAttribute("data-ad-frequency-hint", "30s");
-          script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-${data.publisherId}`;
-          script.setAttribute("crossorigin", "anonymous");
-          if (debug) script.setAttribute("data-adbreak-test", "on");
-
-          // Create the second script tag with inline script content
-          window.adsbygoogle = window.adsbygoogle || [];
-          window.adConfig = function (o) {
-            adsbygoogle.push(o);
-          };
-          window.adBreak = window.adConfig;
-          sdkContext.adBreak = window.adBreak;
-
-          // Append both script tags to the head of the document
-          document.body.appendChild(script);
-          currentSdk.implementation.setUpEventListeners();
-
-          let deferredResolve;
-          let deferredPromise = new Promise((resolve) => {
-            deferredResolve = resolve;
-          });
-          // Wait for the script to load
-          script.onload = function () {
-            // Create the ad container dynamically
-            if (data.bannerEnabled) {
-              var adContainer = document.createElement("ins");
-              adContainer.className = "adsbygoogle";
-              adContainer.style.display = "block";
-              adContainer.setAttribute(
-                "data-ad-client",
-                `ca-${data.publisherId}`
-              );
-              adContainer.setAttribute("data-ad-slot", data.dataAdSlot);
-              adContainer.setAttribute("data-ad-format", "auto");
-              adContainer.setAttribute("data-full-width-responsive", "true");
-
-              // Append the ad container to an existing element, e.g., an element with id 'adSpace'
-              let bannerConainerId = data.bannerConainerId || "adSpace";
-              var adSpace = document.getElementById(bannerConainerId);
-              if (!adSpace) {
-                adSpace = document.createElement("div");
-                adSpace.id = bannerConainerId;
-                document.body.appendChild(adSpace); // Append new ad space to the body if it doesn't exist
-              }
-              adSpace.appendChild(adContainer);
-              // Request ads to be shown
-              (adsbygoogle = window.adsbygoogle || []).push({});
-            }
-            if (deferredResolve) deferredResolve();
-          };
-
-          await deferredPromise;
-        },
-        //init(debug = false, data) {},
-        setUpEventListeners() {
-          listen("loadingStart", () => {
-            try {
-              if (funmax) funmax.loadStart();
-              else console.error("funmax not found");
-            } catch (e) {
-              console.error("funmax not found");
-            }
-          });
-          listen("loadingEnd", () => {
-            try {
-              if (funmax) funmax.loadReady();
-              else console.error("funmax not found");
-            } catch (e) {
-              console.error("funmax not found");
-            }
-          });
-          listen("interstitial", () => {
-            sdkContext.adBreak({
-              type: "next",
-              name: "interstitial",
-              beforeAd: () => {
-                dispatch("adStarted", sdkContext.lastRequestedAd);
-              },
-              adBreakDone: (placementInfo) => {
-                dispatch("interstitialEnd", true);
-              },
-            });
-          });
-          listen("rewarded", () => {
-            sdkContext.lastRewardedSuccess = false;
-            sdkContext.adBreak({
-              type: "reward",
-              name: "rewarded",
-              beforeAd: () => {
-                dispatch("adStarted", sdkContext.lastRequestedAd);
-              },
-              adBreakDone: (placementInfo) => {
-                dispatch("rewardedEnd", sdkContext.lastRewardedSuccess);
-              },
-              beforeReward: (showFunc) => {
-                showFunc();
-              },
-              adDismissed: () => {
-                sdkContext.lastRewardedSuccess = false;
-              },
-              adViewed: () => {
-                sdkContext.lastRewardedSuccess = true;
-              },
-            });
-          });
-        },
+        //async preInit(debug = false, data) {},
+        init() {},
+        setUpEventListeners() {},
         hasAdblock() {
           return false;
         },
@@ -972,7 +678,7 @@ globalThis.WebSdkWrapper = (function () {
             if (currentSdk.scriptSrc) {
               const onInit = async () => {
                 sdk = currentSdk.sdk;
-                currentSdk.implementation.setUpEventListeners(debug, data);
+                currentSdk.implementation.setUpEventListeners();
                 if (currentSdk.implementation.init)
                   await currentSdk.implementation.init(debug, data);
                 resolve();

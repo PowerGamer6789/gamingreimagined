@@ -207,39 +207,21 @@
     "achievement": -1
   },
   {
-    "name": "ShyGdShdduy",
+    "name": "ShyGuy",
     "hidden": false,
-    "icon": "ShyGuy.png",
+    "icon": "shyguy.png",
     "skin": "shyguy",
     "lang": "shyguy",
     "price": 0,
     "achievement": -1
   },
   {
-    "name": "CoolTasDude",
+    "name": "Among Us",
     "hidden": false,
-    "icon": "ctd.png",
-    "skin": "ctd",
-    "lang": "ctd",
-    "price": 0,
-    "achievement": -1
-  },
-  {
-    "name": "Ov",
-    "hidden": false,
-    "icon": "Ov.png",
-    "skin": "ov",
-    "lang": "ov",
-    "price": 0,
-    "achievement": -1
-  },
-  {
-    "name": "Annihilazer",
-    "hidden": false,
-    "icon": "Annihilazer.png",
-    "skin": "anni",
-    "lang": "anni",
-    "price": 0,
+    "icon": "amongus.png",
+    "skin": "amongus",
+    "lang": "amongus",
+    "price": 50,
     "achievement": -1
   }
 ]

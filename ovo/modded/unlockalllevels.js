@@ -37,25 +37,6 @@ function initWebSdkWrapper(debug = false) {
     WebSdkWrapper.onAdStarted(() => {
       c2_callFunction("adStarted");
     });
-
-    try {
-      let json = JSON.parse(config);
-      if (json.name === "Xiaomi" && json.fixXiaomiBug) {
-        document.getElementById("c2canvasdiv").classList.remove("hidden");
-        let tries = 50;
-        let interval = setInterval(() => {
-          tries--;
-          let c2canvasDiv = document.getElementById("c2canvasdiv");
-          if (c2canvasDiv.classList.contains("hidden")) {
-            c2canvasDiv.classList.remove("hidden");
-            tries = 0;
-          }
-          if (tries <= 0) {
-            clearInterval(interval);
-          }
-        }, 5);
-      }
-    } catch (e) {}
   };
 
   try {
@@ -298,7 +279,7 @@ function crazyMidRoll(adType) {
   // if (crazysdk) crazysdk.requestAd("midgame");
 }
 
-function crazyRewarded(adType) {
+function crazyRewarded() {
   if (!interTypeAllowed(adType)) return;
   globalThis.WebSdkWrapper.rewarded().then((success) => {
     if (success) c2_callFunction("adOver");

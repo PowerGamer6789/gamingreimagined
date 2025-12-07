@@ -48,18 +48,6 @@
     "levels": [53, 60]
   },
   {
-    "name": "Advanced",
-    "lang": "gauntlet",
-    "textScale": 1,
-    "levels": [61, 64]
-  },
-    {
-    "name": "Ascension",
-    "lang": "gauntlet",
-    "textScale": 1,
-    "levels": [65, 72]
-  },
-  {
     "name": "Training Level",
     "lang": "Training",
     "textScale": 1,

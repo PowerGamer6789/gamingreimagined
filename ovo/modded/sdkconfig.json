@@ -7,8 +7,7 @@
     "GameMonetize",
     "CoolMathGames",
     "HoodaMath",
-    "FreezeNova",
-    "Xiaomi"
+    "FreezeNova"
   ],
   "name": "",
   "gameId": "1377b99c10284c229423118a941af3b1",
@@ -34,11 +33,5 @@
     "onlinegames.io",
     "unblocked-games.s3.amazonaws.com"
   ],
-  "correctWebsite": "www.onlinegames.io/games/ovo",
-  "freezeNovaId": 0,
-  "publisherId": "pub-7151632855683728",
-  "bannerEnabled": false,
-  "dataAdSlot": "6677853674",
-  "bannerConainerId": "adSpace",
-  "fixXiaomiBug": true
+  "correctWebsite": "www.onlinegames.io/games/ovo"
 }
