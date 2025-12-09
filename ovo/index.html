@@ -71,9 +71,16 @@
                 localStorage.setItem("cookieWarningShown", "true");
         }
         })();
-</script>
+	</script>
+	<script>
+	    window.addEventListener("beforeunload", (event) => {
+	        // Set a truthy value to property returnValue to trigger the dialog
+	        event.returnValue = true; 
+	        // You can also return a string here, but modern browsers often display a generic message.
+	        // return "Are you sure you want to leave this page? You may lose unsaved changes.";
+	    });
+	</script>
 
-	
 	<!-- The canvas must be inside a div called c2canvasdiv -->
 	<div id="c2canvasdiv">
 	
