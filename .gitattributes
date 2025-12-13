@@ -1,3 +1,4 @@
 # Auto detect text files and perform LF normalization
 * text=auto
 /gamingreimagined/frame/game/undertale/game.unx filter=lfs diff=lfs merge=lfs -text
+frame/game/undertale/game.unx filter=lfs diff=lfs merge=lfs -text
