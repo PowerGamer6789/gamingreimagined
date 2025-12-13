@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout (with LFS, because duh)
+      - name: Checkout
         uses: actions/checkout@v4
         with:
           lfs: true
@@ -35,8 +35,9 @@ jobs:
       - name: Upload site
         uses: actions/upload-pages-artifact@v3
         with:
-          path: ./ # change if your site lives somewhere else
+          path: ./
 
       - name: Deploy
         id: deployment
         uses: actions/deploy-pages@v4
+
