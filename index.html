@@ -116,10 +116,37 @@
   </div>
 </div>
 
+<div class="save-management" style="margin: 20px 0;">
+  <button onclick="exportGlobalSave()" class="save-btn">Export All Saves</button>
+  <button onclick="document.getElementById('globalImport').click()" class="save-btn">Import Saves</button>
+  <input type="file" id="globalImport" style="display:none" accept=".grs" onchange="importGlobalSave(this.files[0])">
+</div>
+
+<style>
+  .save-btn {
+    background: #181818;
+    color: #ffcc00;
+    border: 2px solid #ffcc00;
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: bold;
+    margin: 0 10px;
+    transition: 0.3s;
+    font-size: 14px;
+  }
+  .save-btn:hover {
+    background: #ffcc00;
+    color: #121212;
+    transform: translateY(-2px);
+  }
+</style>
+
 <img src="/logo_light.png" class="footer-logo">
 <a href="/feedback" class="feedback-btn">Give us Feedback</a>
 
 <script src="https://cdn.jsdelivr.net/gh/PowerGamer6789/teampwR_resources@main/console.js"></script>
+<script src="/save-mngr.js"></script>
 
 </body>
 </html>

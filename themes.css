@@ -131,7 +131,6 @@ html[data-bs-theme="kazwire"] .close-btn:hover {
 	transform: scale(1.05);
 }
 
-/* Ads */
 html[data-bs-theme="kazwire"] .ads {
 	width: 260px;
 	background: #181818;
@@ -139,6 +138,60 @@ html[data-bs-theme="kazwire"] .ads {
 	border-radius: 12px;
 	padding: 15px;
 	overflow: hidden;
+}
+
+html[data-bs-theme="kazwire"] .export-btn {
+    position: absolute;
+    bottom: 15px;
+    right: 165px;
+    width: 40px;
+    height: 40px;
+    background: #ffcc00;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+html[data-bs-theme="kazwire"] .import-btn {
+    position: absolute;
+    bottom: 15px;
+    right: 115px; 
+    width: 40px;
+    height: 40px;
+    background: #ffcc00;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+html[data-bs-theme="kazwire"] .export-btn:hover,
+html[data-bs-theme="kazwire"] .import-btn:hover {
+    background: #ffaa00;
+    transform: scale(1.05);
+}
+
+html[data-bs-theme="kazwire"] .export-btn::after {
+    content: '\2913'; /* Download icon */
+    font-size: 20px;
+    color: #000;
+	font-weight: bold;
+}
+
+.game-title, .game-author {
+  pointer-events: none; /* Clicks pass through text to the box/iframe */
+}
+
+html[data-bs-theme="kazwire"] .import-btn::after {
+    content: '\2912'; /* Upload icon */
+    font-size: 20px;
+    color: #000;
+	font-weight: bold;
 }
 
 html[data-bs-theme="kazwire"] .ad-slot { 

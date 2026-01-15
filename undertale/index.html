@@ -23,10 +23,10 @@
 
 <div class="container">
   <div class="game-box">
-    <iframe id="gameframe" src="/frame/game/undertale/"></iframe>
+    <iframe id="gameframe" src="/frame/game/undertale/" tabindex="0"></iframe>
     <div class="game-title">UNDERTALE</div>
     <div class="game-author">By Toby Fox</div>
-    <!-- Buttons: close left of fullscreen -->
+
     <a class="close-btn" onclick="closeGame()">X</a>
     <a class="full-btn" onclick="toggleFullscreen(document.getElementById('gameframe'))"></a>
   </div>
@@ -40,6 +40,19 @@
 <script>
 const adsArea = document.getElementById('adsArea');
 let adIndex = 0;
+document.addEventListener("DOMContentLoaded", () => {
+  const gameFrame = document.getElementById("gameframe");
+  const gameBox = document.querySelector(".game-box");
+
+  if (gameFrame && gameBox) {
+    gameFrame.focus();
+
+    gameBox.addEventListener("click", () => {
+      gameFrame.focus();
+    });
+  }
+});
+
 
 function rotateAd() {
   if (!ads || ads.length === 0) return;

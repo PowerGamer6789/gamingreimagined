@@ -7,7 +7,7 @@ const ads = [
   { img: "/ads/thereisnogame.png", href: "/thereisnogame" },
   { img: "/ads/eggycar.png", href: "/eggycar" },
   { img: "/ads/bloxorz.png", href: "/bloxorz" },
-  { img: "/ads/starlight.png", href: "https://starlight.baumgardner.us" },
+  { img: "/ads/starlight.png", href: "https://starlight.webconstructions.co.uk" },
 ];
 
 // Fisher–Yates shuffle
