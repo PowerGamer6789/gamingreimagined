@@ -1,12 +1,12 @@
 const ads = [
-  { img: "/ads/escaperoad.png", href: "/escaperoad" },
-  { img: "/ads/undertale.png", href: "/undertale" },
-  { img: "/ads/ovo.png", href: "/ovo" },
+  { img: "/ads/escaperoad.png", href: "/game/?id=2" },
+  { img: "/ads/undertale.png", href: "/game/?id=1" },
+  { img: "/ads/ovo.png", href: "/game/?id=3" },
   { img: "/ads/feedback.png" },
-  { img: "/ads/subwaysurfers.png", href: "/subwaysurfers" },
-  { img: "/ads/thereisnogame.png", href: "/thereisnogame" },
-  { img: "/ads/eggycar.png", href: "/eggycar" },
-  { img: "/ads/bloxorz.png", href: "/bloxorz" },
+  { img: "/ads/subwaysurfers.png", href: "/game/?id=5" },
+  { img: "/ads/thereisnogame.png", href: "/game/?id=6" },
+  { img: "/ads/eggycar.png", href: "/game/?id=7" },
+  { img: "/ads/bloxorz.png", href: "/game/?id=8" },
   { img: "/ads/starlight.png", href: "https://starlight.webconstructions.co.uk" },
 ];
 
