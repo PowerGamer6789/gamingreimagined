@@ -80,43 +80,68 @@ async function injectIDB(name, content) {
 }
 
 async function exportGlobalSave() {
-  const backup = {
-    site: "Gaming Reimagined",
-    date: new Date().toISOString(),
-    local: { ...localStorage },
-    idb: {}
-  };
-
   try {
-    if (window.indexedDB.databases) {
-      const dbList = await window.indexedDB.databases();
-      for (let dbInfo of dbList) {
-        if (!dbInfo.name) continue;
-        backup.idb[dbInfo.name] = await extractIDB(dbInfo.name);
+    const backupMetadata = {
+      site: "Gaming Reimagined",
+      date: new Date().toISOString(),
+      local: { ...localStorage }
+    };
+
+    const encoder = new TextEncoder();
+    const { readable, writable } = new TransformStream();
+    const writer = writable.getWriter();
+
+    const process = (async () => {
+      await writer.write(encoder.encode(MAGIC_BYTE));
+
+      const compressionStream = new CompressionStream("gzip");
+      const compressWriter = compressionStream.writable.getWriter();
+      
+      const reader = compressionStream.readable.getReader();
+      const pipePromise = (async () => {
+        while (true) {
+          const { value, done } = await reader.read();
+          if (done) break;
+          await writer.write(value);
+        }
+      })();
+
+      const metaString = JSON.stringify(backupMetadata);
+      await compressWriter.write(encoder.encode(metaString.slice(0, -1) + ',"idb":{'));
+
+      if (window.indexedDB.databases) {
+        const dbList = await window.indexedDB.databases();
+        for (let i = 0; i < dbList.length; i++) {
+          const dbName = dbList[i].name;
+          if (!dbName) continue;
+
+          const dbData = await extractIDB(dbName);
+          let entry = `"${dbName}":${JSON.stringify(dbData)}`;
+          if (i < dbList.length - 1) entry += ",";
+          
+          await compressWriter.write(encoder.encode(entry));
+        }
       }
-    }
 
-    const jsonString = JSON.stringify(backup);
-    const stream = new Blob([jsonString]).stream();
+      await compressWriter.write(encoder.encode("}}"));
+      await compressWriter.close();
+      await pipePromise;
 
-    const compressedStream = stream.pipeThrough(new CompressionStream("gzip"));
-    const compressedResponse = new Response(compressedStream);
-    const compressedBuffer = await compressedResponse.arrayBuffer();
+      await writer.write(encoder.encode(MAGIC_BYTE));
+      await writer.close();
+    })();
 
-    const magicHeader = new TextEncoder().encode(MAGIC_BYTE);
-    const finalBlob = new Blob([magicHeader, compressedBuffer, magicHeader], { type: 'application/octet-stream' });
-    
-    const url = URL.createObjectURL(finalBlob);
+    const blob = await new Response(readable).blob();
+    const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `GamingReimaginedSave_${new Date().toISOString().split('T')[0]}.grs`;
-    
-    document.body.appendChild(link);
+    link.download = `Backup_${Date.now()}.grs`;
     link.click();
-    document.body.removeChild(link);
+
+    await process;
     URL.revokeObjectURL(url);
   } catch (err) {
-    alert("Error creating backup: " + err.message);
+    alert("Export failed: " + err.message);
   }
 }
 
@@ -129,31 +154,33 @@ async function extractIDB(name) {
       const result = {};
       const storeNames = Array.from(db.objectStoreNames);
       
-      for (let sName of storeNames) {
+      for (const sName of storeNames) {
         result[sName] = await new Promise((res) => {
+          const storeMap = {};
           const tx = db.transaction(sName, "readonly");
           const store = tx.objectStore(sName);
-          const allDataReq = store.getAll();
-          const allKeysReq = store.getAllKeys();
-          
-          allDataReq.onsuccess = () => {
-            allKeysReq.onsuccess = () => {
-              const storeMap = {};
-              allKeysReq.result.forEach((key, i) => {
-                storeMap[key] = allDataReq.result[i];
-              });
+          const cursorReq = store.openCursor();
+
+          cursorReq.onsuccess = (e) => {
+            const cursor = e.target.result;
+            if (cursor) {
+              storeMap[cursor.key] = cursor.value;
+              cursor.continue();
+            } else {
               res(storeMap);
-            };
+            }
           };
-          
-          allDataReq.onerror = () => res({});
+
+          cursorReq.onerror = () => res({});
         });
       }
       
       db.close();
       resolve(result);
     };
-    
+
     req.onerror = () => resolve({});
   });
 }
+
+
