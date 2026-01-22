@@ -35,7 +35,7 @@
 <script>
 /* ================= GAME DATA ================= */
 const games = {
-  1: "Undertale",
+  1: "UNDERTALE",
   2: "Escape Road",
   3: "OvO",
   4: "Five Nights at Freddy's",
@@ -44,7 +44,7 @@ const games = {
   7: "Eggy Car",
   8: "Bloxorz",
   9: "Crossy Road",
-  10: "Bad Time Simulator"
+  10: "Bad Time Simulator",
 };
 
 const authors = {
@@ -57,7 +57,12 @@ const authors = {
   7: "Beedo Games",
   8: "Damien Clark",
   9: "Hipster Whale",
-  10: "Joe Zeng"
+  10: "Joe Zeng",
+};
+
+// IDs that need special iframe paths
+const hardcodedFrames = {
+  1: "/frame/game/undertale_sorry/",
 };
 
 // get ?id from URL
@@ -70,11 +75,12 @@ let author = authors[id];
 if (!title) {
   title = "Invalid";
   author = "pwR";
-  document.getElementById("gameframe").src = "/frame/game/closed";
+  gameframe.src = "/frame/game/closed";
+} else if (hardcodedFrames[id]) {
+  gameframe.src = hardcodedFrames[id];
 } else {
-  // make the src: lowercase, remove spaces and apostrophes/punctuation
-  const cleanSrc = title.toLowerCase().replace(/[^a-z0-9]/g,'');
-  document.getElementById("gameframe").src = `/frame/game/${cleanSrc}/`;
+  const cleanSrc = title.toLowerCase().replace(/[^a-z0-9]/g, '');
+  gameframe.src = `/frame/game/${cleanSrc}/`;
 }
 
 // set titles and author
