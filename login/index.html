@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; min-height: 100vh;
+      font-family: system-ui, -apple-system, sans-serif;
+      background: radial-gradient(1200px 600px at top, #1f1f1f, #0a0a0a);
+      color: #fff; display: flex; align-items: center; justify-content: center; overflow: hidden;
+    }
+    .card {
+      width: 100%; max-width: 440px; padding: 45px;
+      background: linear-gradient(180deg, rgba(30,30,30,0.95), rgba(15,15,15,0.95));
+      border-radius: 20px; box-shadow: 0 30px 80px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05);
+      text-align: center; animation: pop 0.6s ease;
+    }
+    @keyframes pop { from { opacity: 0; transform: scale(0.95) translateY(20px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+    
+    .logo { width: 260px; margin-bottom: 30px; }
+
+    input {
+      width: 100%; padding: 14px 18px; margin: 10px 0;
+      background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px; color: #fff; font-size: 16px; outline: none; transition: border 0.2s;
+    }
+    input:focus { border-color: #5865F2; }
+
+    .btn {
+      width: 100%; padding: 14px; margin-top: 15px;
+      border-radius: 12px; font-weight: 700; font-size: 15px;
+      cursor: pointer; transition: all 0.2s; font-family: inherit; display: block;
+    }
+
+    .btn-primary { background: #5865F2; border: none; color: #fff; }
+    .btn-primary:hover { background: #4752c4; transform: translateY(-1px); }
+
+    .btn-outline {
+      background: transparent; border: 1px solid rgba(255,255,255,0.2);
+      color: #fff; margin-top: 10px; text-decoration: none;
+    }
+    .btn-outline:hover { background: rgba(255,255,255,0.05); border-color: rgba(255,255,255,0.4); }
+
+    #message { font-size: 14px; margin-top: 15px; min-height: 20px; font-weight: 500; }
+    .error { color: #ff5c5c; }
+    .success { color: #43b581; }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <img src="/logo_homepage.png" alt="PWR" class="logo">
+  
+  <input type="text" id="username" placeholder="Username" spellcheck="false">
+  <input type="password" id="password" placeholder="Password">
+  
+  <button id="loginBtn" class="btn btn-primary">Sign In</button>
+  <button id="signupBtn" class="btn btn-outline">Create Account</button>
+  
+  <div id="message"></div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+import {
+  getAuth,
+  signInWithEmailAndPassword,
+  createUserWithEmailAndPassword,
+  updateProfile
+} from "https://www.gstatic.com/firebasejs/10.11.0/firebase-auth.js";
+import { firebaseConfig } from "/creds.js";
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
+const userInput = document.getElementById("username");
+const passInput = document.getElementById("password");
+const msg = document.getElementById("message");
+
+const ERROR_TABLE = {
+  "auth/invalid-email": "Invalid username",
+  "auth/email-already-in-use": "This username is already in use",
+  "auth/weak-password": "Choose a stronger password and try again",
+  "auth/too-many-requests": "429 Too Many Requests",
+  "default": "Invalid username or password"
+};
+
+const getEmail = u => `${u.trim().toLowerCase()}@team.pwr`;
+const getRedirect = () =>
+  new URLSearchParams(window.location.search).get("returnTo") || "/";
+
+const showError = (e) => {
+  msg.textContent = ERROR_TABLE[e.code] || ERROR_TABLE.default;
+  msg.className = "error";
+  console.error(e.code);
+};
+
+// LOGIN
+document.getElementById("loginBtn").onclick = async () => {
+  msg.className = "";
+  try {
+    await signInWithEmailAndPassword(
+      auth,
+      getEmail(userInput.value),
+      passInput.value
+    );
+    window.location.href = getRedirect();
+  } catch (e) {
+    showError(e);
+  }
+};
+
+// SIGNUP
+document.getElementById("signupBtn").onclick = async () => {
+  msg.className = "";
+  try {
+    if (userInput.value.trim().length < 3)
+      throw { code: "custom/username-short" };
+    if (passInput.value.length < 6)
+      throw { code: "custom/password-short" };
+
+    const res = await createUserWithEmailAndPassword(
+      auth,
+      getEmail(userInput.value),
+      passInput.value
+    );
+
+    await updateProfile(res.user, {
+      displayName: userInput.value.trim()
+    });
+
+    msg.textContent = "Account created";
+    msg.className = "success";
+    setTimeout(() => window.location.href = getRedirect(), 800);
+  } catch (e) {
+    ERROR_TABLE["custom/username-short"] = "Username too short.";
+    ERROR_TABLE["custom/password-short"] = "Password too short.";
+    showError(e);
+  }
+};
+</script>
+</body>
+</html>

@@ -289,4 +289,34 @@ html[data-bs-theme="kazwire"] .feedback-btn {
 	z-index: 9999;
 }
 
+html[data-bs-theme="kazwire"] #loginStatus {
+  position: absolute;
+  top: 10px;
+  right: 25px;
+  z-index: 10000;
+  padding: 5px; /* Added a lil padding */
+}
+
+/* Style for both "Log in" and "Username" */
+html[data-bs-theme="kazwire"] .auth-link {
+  color: #fff;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  opacity: 0.85;
+  transition: opacity 0.2s, color 0.2s;
+  cursor: pointer;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: rgba(30, 30, 30, 0.6);
+  border-radius: 999px;
+  backdrop-filter: blur(6px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+html[data-bs-theme="kazwire"] .auth-link:hover {
+  opacity: 1;
+  color: #ff5c5c; /* Using the red from your provided page for hover */
+}
+
 /* End Kazwire Theme */

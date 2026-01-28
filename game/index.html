@@ -1,141 +1,143 @@
 <!DOCTYPE html>
 <html lang="en" data-bs-theme="kazwire">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title id="pageTitle">Game</title>
   <link rel="stylesheet" href="/themes.css">
 </head>
+
 <body>
-<div id="loginStatus"></div>
+  <div id="loginStatus"></div>
+  <header>
+    <img src="/logo_navbar.png" alt="Logo">
+    <nav>
+      <a href="/">Home</a>
+      <a href="/games">Games</a>
+      <a href="/feedback">Feedback</a>
+    </nav>
+  </header>
 
-<header>
-  <img src="/logo_navbar.png" alt="Logo">
-  <nav>
-    <a href="/">Home</a>
-    <a href="/games">Games</a>
-    <a href="/feedback">Feedback</a>
-  </nav>
-</header>
+  <div class="container">
+    <div class="game-box">
+      <iframe id="gameframe" allowfullscreen sandbox="allow-scripts allow-same-origin"></iframe>
+      <div class="game-title" id="gameTitle"></div>
+      <div class="game-author" id="gameAuthor"></div>
+      <a class="close-btn" onclick="closeGame()">X</a>
+      <a class="full-btn" onclick="toggleFullscreen(document.getElementById('gameframe'))"></a>
+    </div>
 
-<div class="container">
-  <div class="game-box">
-    <iframe id="gameframe" allowfullscreen sandbox="allow-scripts allow-same-origin"></iframe>
-    <div class="game-title" id="gameTitle"></div>
-    <div class="game-author" id="gameAuthor"></div>
-    <a class="close-btn" onclick="closeGame()">X</a>
-    <a class="full-btn" onclick="toggleFullscreen(document.getElementById('gameframe'))"></a>
+    <div class="ads" id="adsArea"></div>
   </div>
-  
-  <div class="ads" id="adsArea"></div>
-</div>
 
-<script src="/ads/ads.js"></script>
+  <script src="/ads/ads.js"></script>
 
-<script>
-/* ================= GAME DATA ================= */
-const games = {
-  1: "UNDERTALE",
-  2: "Escape Road",
-  3: "OvO",
-  4: "Five Nights at Freddy's",
-  5: "Subway Surfers",
-  6: "There is No Game",
-  7: "Eggy Car",
-  8: "Bloxorz",
-  9: "Crossy Road",
-  10: "Bad Time Simulator",
-};
+  <script>
+    /* ================= GAME DATA ================= */
+    const games = {
+      1: "UNDERTALE",
+      2: "Escape Road",
+      3: "OvO",
+      4: "Five Nights at Freddy's",
+      5: "Subway Surfers",
+      6: "There is No Game",
+      7: "Eggy Car",
+      8: "Bloxorz",
+      9: "Crossy Road",
+      10: "Bad Time Simulator",
+    };
 
-const authors = {
-  1: "Toby Fox",
-  2: "1games.io",
-  3: "Dedra Games",
-  4: "Scott Cawthon",
-  5: "SYBO Games",
-  6: "Kamizoto",
-  7: "Beedo Games",
-  8: "Damien Clark",
-  9: "Hipster Whale",
-  10: "Joe Zeng",
-};
+    const authors = {
+      1: "Toby Fox",
+      2: "1games.io",
+      3: "Dedra Games",
+      4: "Scott Cawthon",
+      5: "SYBO Games",
+      6: "Kamizoto",
+      7: "Beedo Games",
+      8: "Damien Clark",
+      9: "Hipster Whale",
+      10: "Joe Zeng",
+    };
 
-// IDs that need special iframe paths
-const hardcodedFrames = {
-  1: "/frame/game/undertale_sorry/",
-};
+    // IDs that need special iframe paths
+    const hardcodedFrames = {
+      1: "/frame/game/undertale_sorry/",
+    };
 
-// get ?id from URL
-const params = new URLSearchParams(window.location.search);
-const id = params.get("id");
+    // get ?id from URL
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
 
-let title = games[id];
-let author = authors[id];
+    let title = games[id];
+    let author = authors[id];
 
-if (!title) {
-  title = "Invalid";
-  author = "pwR";
-  gameframe.src = "/frame/game/closed";
-} else if (hardcodedFrames[id]) {
-  gameframe.src = hardcodedFrames[id];
-} else {
-  const cleanSrc = title.toLowerCase().replace(/[^a-z0-9]/g, '');
-  gameframe.src = `/frame/game/${cleanSrc}/`;
-}
+    if (!title) {
+      title = "Invalid";
+      author = "pwR";
+      gameframe.src = "/frame/game/closed";
+    } else if (hardcodedFrames[id]) {
+      gameframe.src = hardcodedFrames[id];
+    } else {
+      const cleanSrc = title.toLowerCase().replace(/[^a-z0-9]/g, '');
+      gameframe.src = `/frame/game/${cleanSrc}/`;
+    }
 
-// set titles and author
-document.getElementById("pageTitle").textContent = title;
-document.getElementById("gameTitle").textContent = title;
-document.getElementById("gameAuthor").textContent = `By ${author}`;
+    // set titles and author
+    document.getElementById("pageTitle").textContent = title;
+    document.getElementById("gameTitle").textContent = title;
+    document.getElementById("gameAuthor").textContent = `By ${author}`;
 
-/* ================= FULLSCREEN ================= */
-function toggleFullscreen(elem) {
-  if (!document.fullscreenElement) elem.requestFullscreen();
-  else document.exitFullscreen();
+    /* ================= FULLSCREEN ================= */
+    function toggleFullscreen(elem) {
+      if (!document.fullscreenElement) elem.requestFullscreen();
+      else document.exitFullscreen();
 
-  document.addEventListener("fullscreenchange", () => {
-    elem.style.borderRadius = document.fullscreenElement ? "0" : "10px";
-  });
-}
+      document.addEventListener("fullscreenchange", () => {
+        elem.style.borderRadius = document.fullscreenElement ? "0" : "10px";
+      });
+    }
 
-/* ================= CLOSE ================= */
-function closeGame() {
-  document.getElementById("gameframe").src = "/frame/game/closed";
-}
+    /* ================= CLOSE ================= */
+    function closeGame() {
+      document.getElementById("gameframe").src = "/frame/game/closed";
+    }
 
-/* ================= ADS ================= */
-const adsArea = document.getElementById('adsArea');
-let adIndex = 0;
+    /* ================= ADS ================= */
+    const adsArea = document.getElementById('adsArea');
+    let adIndex = 0;
 
-function rotateAd() {
-  if (!ads || ads.length === 0) return;
+    function rotateAd() {
+      if (!ads || ads.length === 0) return;
 
-  const ad = ads[adIndex];
-  adsArea.innerHTML = '';
+      const ad = ads[adIndex];
+      adsArea.innerHTML = '';
 
-  const slot = document.createElement('div');
-  slot.className = 'ad-slot';
+      const slot = document.createElement('div');
+      slot.className = 'ad-slot';
 
-  const img = document.createElement('img');
-  img.src = ad.img;
+      const img = document.createElement('img');
+      img.src = ad.img;
 
-  if (ad.href) {
-    const link = document.createElement('a');
-    link.href = ad.href;
-    link.appendChild(img);
-    slot.appendChild(link);
-  } else {
-    slot.appendChild(img);
-  }
+      if (ad.href) {
+        const link = document.createElement('a');
+        link.href = ad.href;
+        link.appendChild(img);
+        slot.appendChild(link);
+      } else {
+        slot.appendChild(img);
+      }
 
-  adsArea.appendChild(slot);
-  adIndex = (adIndex + 1) % ads.length;
-}
+      adsArea.appendChild(slot);
+      adIndex = (adIndex + 1) % ads.length;
+    }
 
-rotateAd();
-setInterval(rotateAd, 10000);
-</script>
+    rotateAd();
+    setInterval(rotateAd, 10000);
+  </script>
 
-<script type="module" defer src="/creds.js"></script>
+  <script type="module" defer src="/creds.js"></script>
 </body>
+
 </html>
