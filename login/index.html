@@ -81,12 +81,56 @@ const passInput = document.getElementById("password");
 const msg = document.getElementById("message");
 
 const ERROR_TABLE = {
+  // ─── EMAIL / PASSWORD ─────────────────────────────
   "auth/invalid-email": "Invalid username",
+  "auth/user-not-found": "Invalid username or password",
+  "auth/wrong-password": "Invalid username or password",
+  "auth/invalid-login-credentials": "Invalid username or password",
   "auth/email-already-in-use": "This username is already in use",
   "auth/weak-password": "Choose a stronger password and try again",
+  "auth/missing-email": "Username is required",
+  "auth/missing-password": "Password is required",
+
+  // ─── ACCOUNT STATE ────────────────────────────────
+  "auth/user-disabled": "This account has been banned",
+  "auth/requires-recent-login": "Please log in again",
+  "auth/user-token-expired": "Session expired, please log in again",
+  "auth/invalid-user-token": "Session expired, please log in again",
+
+  // ─── RATE LIMIT / ABUSE ───────────────────────────
   "auth/too-many-requests": "429 Too Many Requests",
+
+  // ─── NETWORK / FIREBASE ISSUES ────────────────────
+  "auth/network-request-failed": "Network error, try again",
+  "auth/internal-error": "Internal server error",
+
+  // ─── CONFIG / DEV SCREWUPS ────────────────────────
+  "auth/invalid-api-key": "Authentication misconfigured",
+  "auth/app-not-authorized": "Authentication misconfigured",
+  "auth/unauthorized-domain": "This site is not authorized",
+  "auth/operation-not-allowed": "Authentication method not enabled",
+  "auth/invalid-credential": "Invalid username or password",
+
+  // ─── OAUTH / PROVIDER STUFF ───────────────────────
+  "auth/account-exists-with-different-credential": "Account exists with a different sign-in method",
+  "auth/credential-already-in-use": "This credential is already linked to another account",
+  "auth/provider-already-linked": "Provider already linked",
+  "auth/no-such-provider": "Sign-in provider not found",
+
+  // ─── POPUP / REDIRECT (BROWSER DRAMA) ─────────────
+  "auth/popup-blocked": "Popup was blocked by the browser",
+  "auth/popup-closed-by-user": "Login popup was closed",
+
+  // ─── PHONE AUTH (IF YOU EVER USE IT) ──────────────
+  "auth/invalid-verification-code": "Invalid verification code",
+  "auth/invalid-verification-id": "Invalid verification session",
+  "auth/missing-verification-code": "Verification code required",
+  "auth/missing-verification-id": "Verification session missing",
+
+  // ─── CATCH-ALL ───────────────────────────────────
   "default": "Invalid username or password"
 };
+
 
 const getEmail = u => `${u.trim().toLowerCase()}@team.pwr`;
 const getRedirect = () =>

@@ -316,7 +316,7 @@ html[data-bs-theme="kazwire"] .auth-link {
 
 html[data-bs-theme="kazwire"] .auth-link:hover {
   opacity: 1;
-  color: #ff5c5c; /* Using the red from your provided page for hover */
+  color: #ffcc00; /* Using the red from your provided page for hover */
 }
 
 /* End Kazwire Theme */

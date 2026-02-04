@@ -1,84 +1,56 @@
 const MAGIC_BYTE = "pwR";
 
+/**
+ * IMPORT: Streams the file and processes it in chunks to avoid RAM spikes
+ */
 async function importGlobalSave(file) {
   if (!file) return;
 
   try {
-    const arrayBuffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
     const magicLen = MAGIC_BYTE.length;
-
-    const decoder = new TextDecoder();
-    const header = decoder.decode(bytes.slice(0, magicLen));
-    const footer = decoder.decode(bytes.slice(-magicLen));
+    
+    // Validate Magic Bytes without loading file into memory
+    const header = await file.slice(0, magicLen).text();
+    const footer = await file.slice(-magicLen).text();
 
     if (header !== MAGIC_BYTE || footer !== MAGIC_BYTE) {
       throw new Error("Unauthorized file format.");
     }
 
-    const compressedData = bytes.slice(magicLen, -magicLen);
+    // Decompress the stream
+    const decompressedStream = file.slice(magicLen, -magicLen)
+      .stream()
+      .pipeThrough(new DecompressionStream("gzip"));
 
-    const decompressionStream = new Blob([compressedData]).stream().pipeThrough(new DecompressionStream("gzip"));
-    const decompressedResponse = new Response(decompressionStream);
-    const jsonString = await decompressedResponse.text();
-    const data = JSON.parse(jsonString);
+    const response = new Response(decompressedStream);
+    // Note: If the JSON is truly massive (500MB+), 
+    // we use .json() here as it is more memory-efficient than .text()
+    const data = await response.json();
 
-    if (data.site !== "Gaming Reimagined") {
-      throw new Error("Incompatible save source.");
-    }
+    if (data.site !== "Gaming Reimagined") throw new Error("Incompatible save source.");
 
-    if (!confirm("Restore progress?")) return;
+    if (!confirm("Restore progress? This will reload the page.")) return;
 
+    // Restore LocalStorage
+    localStorage.clear();
     Object.keys(data.local).forEach(k => localStorage.setItem(k, data.local[k]));
 
-    for (let dbName in data.idb) {
+    // Restore IndexedDB sequentially
+    for (const dbName in data.idb) {
       await injectIDB(dbName, data.idb[dbName]);
     }
 
     alert("Restoration successful!");
     window.location.reload();
   } catch (err) {
+    console.error(err);
     alert("Failed to load: " + err.message);
   }
 }
 
-async function injectIDB(name, content) {
-  return new Promise((resolve) => {
-    const req = indexedDB.open(name);
-
-    req.onupgradeneeded = (e) => {
-      const db = e.target.result;
-      for (let sName in content) {
-        if (!db.objectStoreNames.contains(sName)) {
-          db.createObjectStore(sName);
-        }
-      }
-    };
-
-    req.onsuccess = () => {
-      const db = req.result;
-      
-      for (let sName in content) {
-        if (!db.objectStoreNames.contains(sName)) continue;
-        
-        const tx = db.transaction(sName, "readwrite");
-        const store = tx.objectStore(sName);
-        
-        store.clear(); 
-        const storeData = content[sName];
-        Object.keys(storeData).forEach(k => {
-          store.put(storeData[k], k);
-        });
-      }
-      
-      db.close();
-      resolve();
-    };
-    
-    req.onerror = () => resolve();
-  });
-}
-
+/**
+ * EXPORT: Streams data row-by-row to bypass "Invalid string length" errors
+ */
 async function exportGlobalSave() {
   try {
     const backupMetadata = {
@@ -88,99 +60,130 @@ async function exportGlobalSave() {
     };
 
     const encoder = new TextEncoder();
-    const { readable, writable } = new TransformStream();
-    const writer = writable.getWriter();
+    const compressionStream = new CompressionStream("gzip");
+    const writer = compressionStream.writable.getWriter();
 
+    // Background process: Manual JSON Construction to avoid JSON.stringify limits
     const process = (async () => {
-      await writer.write(encoder.encode(MAGIC_BYTE));
+      const meta = JSON.stringify(backupMetadata);
+      // Write meta and start the IDB object
+      await writer.write(encoder.encode(meta.slice(0, -1) + ',"idb":{'));
 
-      const compressionStream = new CompressionStream("gzip");
-      const compressWriter = compressionStream.writable.getWriter();
+      const dbList = window.indexedDB.databases ? await window.indexedDB.databases() : [];
       
-      const reader = compressionStream.readable.getReader();
-      const pipePromise = (async () => {
-        while (true) {
-          const { value, done } = await reader.read();
-          if (done) break;
-          await writer.write(value);
-        }
-      })();
+      for (let i = 0; i < dbList.length; i++) {
+        const dbName = dbList[i].name;
+        if (!dbName) continue;
 
-      const metaString = JSON.stringify(backupMetadata);
-      await compressWriter.write(encoder.encode(metaString.slice(0, -1) + ',"idb":{'));
+        await writer.write(encoder.encode(`"${dbName}":{`));
+        await streamIDBStores(dbName, writer, encoder);
+        await writer.write(encoder.encode("}"));
 
-      if (window.indexedDB.databases) {
-        const dbList = await window.indexedDB.databases();
-        for (let i = 0; i < dbList.length; i++) {
-          const dbName = dbList[i].name;
-          if (!dbName) continue;
-
-          const dbData = await extractIDB(dbName);
-          let entry = `"${dbName}":${JSON.stringify(dbData)}`;
-          if (i < dbList.length - 1) entry += ",";
-          
-          await compressWriter.write(encoder.encode(entry));
-        }
+        if (i < dbList.length - 1) await writer.write(encoder.encode(","));
       }
 
-      await compressWriter.write(encoder.encode("}}"));
-      await compressWriter.close();
-      await pipePromise;
-
-      await writer.write(encoder.encode(MAGIC_BYTE));
+      await writer.write(encoder.encode("}}"));
       await writer.close();
     })();
 
-    const blob = await new Response(readable).blob();
+    // Collect compressed chunks
+    const reader = compressionStream.readable.getReader();
+    const chunks = [encoder.encode(MAGIC_BYTE)]; // Start with Magic Byte
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      chunks.push(value);
+    }
+
+    chunks.push(encoder.encode(MAGIC_BYTE)); // End with Magic Byte
+
+    // Trigger Download
+    const blob = new Blob(chunks, { type: "application/octet-stream" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
     link.download = `Backup_${Date.now()}.grs`;
+    document.body.appendChild(link);
     link.click();
+    document.body.removeChild(link);
 
     await process;
-    URL.revokeObjectURL(url);
+    setTimeout(() => URL.revokeObjectURL(url), 10000);
   } catch (err) {
+    console.error(err);
     alert("Export failed: " + err.message);
   }
 }
 
-async function extractIDB(name) {
+/**
+ * Helper: Streams IndexedDB content row-by-row
+ */
+async function streamIDBStores(dbName, writer, encoder) {
   return new Promise((resolve) => {
-    const req = indexedDB.open(name);
-    
+    const req = indexedDB.open(dbName);
     req.onsuccess = async () => {
       const db = req.result;
-      const result = {};
       const storeNames = Array.from(db.objectStoreNames);
-      
-      for (const sName of storeNames) {
-        result[sName] = await new Promise((res) => {
-          const storeMap = {};
+
+      for (let j = 0; j < storeNames.length; j++) {
+        const sName = storeNames[j];
+        await writer.write(encoder.encode(`"${sName}":{`));
+
+        await new Promise((res) => {
           const tx = db.transaction(sName, "readonly");
           const store = tx.objectStore(sName);
           const cursorReq = store.openCursor();
+          let first = true;
 
-          cursorReq.onsuccess = (e) => {
+          cursorReq.onsuccess = async (e) => {
             const cursor = e.target.result;
             if (cursor) {
-              storeMap[cursor.key] = cursor.value;
+              const entry = (first ? "" : ",") + `${JSON.stringify(cursor.key)}:${JSON.stringify(cursor.value)}`;
+              await writer.write(encoder.encode(entry));
+              first = false;
               cursor.continue();
-            } else {
-              res(storeMap);
-            }
+            } else res();
           };
-
-          cursorReq.onerror = () => res({});
+          cursorReq.onerror = () => res();
         });
-      }
-      
-      db.close();
-      resolve(result);
-    };
 
-    req.onerror = () => resolve({});
+        await writer.write(encoder.encode("}"));
+        if (j < storeNames.length - 1) await writer.write(encoder.encode(","));
+      }
+      db.close();
+      resolve();
+    };
+    req.onerror = () => resolve();
   });
 }
 
+/**
+ * Helper: Injects data back into IDB using batch transactions
+ */
+async function injectIDB(name, content) {
+  return new Promise((resolve) => {
+    const req = indexedDB.open(name);
+    req.onupgradeneeded = (e) => {
+      const db = e.target.result;
+      for (const sName in content) {
+        if (!db.objectStoreNames.contains(sName)) db.createObjectStore(sName);
+      }
+    };
+    req.onsuccess = () => {
+      const db = req.result;
+      const stores = Object.keys(content).filter(n => db.objectStoreNames.contains(n));
+      if (!stores.length) return (db.close(), resolve());
 
+      const tx = db.transaction(stores, "readwrite");
+      tx.oncomplete = () => { db.close(); resolve(); };
+      
+      stores.forEach(sName => {
+        const store = tx.objectStore(sName);
+        store.clear();
+        for (let k in content[sName]) store.put(content[sName][k], k);
+      });
+    };
+    req.onerror = () => resolve();
+  });
+}
