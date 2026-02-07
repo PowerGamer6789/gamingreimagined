@@ -319,4 +319,23 @@ html[data-bs-theme="kazwire"] .auth-link:hover {
   color: #ffcc00; /* Using the red from your provided page for hover */
 }
 
+.topbar {
+  display: flex;          /* Enables flexbox */
+  flex-wrap: wrap;       /* Allows buttons to wrap to the next line */
+  gap: 10px;             /* Adds spacing between buttons */
+  justify-content: center; /* Centers the buttons (optional) */
+  padding: 20px;
+}
+
+.topbar a {
+  white-space: nowrap;   /* Prevents text inside the button from breaking */
+  display: inline-block;
+  text-decoration: none;
+  /* Add your existing button styling (padding, background, etc.) here */
+  padding: 10px 20px;
+  background-color: #333; 
+  color: white;
+  border-radius: 5px;
+}
+
 /* End Kazwire Theme */
