@@ -1,0 +1,51 @@
+:root {
+    --bg: #0a0c10; --surface: #161b22; --accent: #00f2ff;
+    --text: #f0f6fc; --muted: #8b949e; --border: #30363d;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+body { background: var(--bg); color: var(--text); height: 100vh; overflow: hidden; }
+
+/* Cinematic Splash - 25% scale */
+#splash { position: fixed; inset: 0; background: #000; z-index: 9999; display: grid; place-items: center; transition: 0.8s ease; }
+#splash-img { width: 25vw; height: auto; animation: pulse 2s ease-in-out infinite; }
+@keyframes pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.05); opacity: 0.8; } }
+
+/* Unified Button System */
+button { border: none; border-radius: 6px; cursor: pointer; transition: 0.2s; font-weight: 600; font-size: 14px; }
+.btn-pwr { background: var(--accent); color: #000; padding: 16px 48px; font-size: 18px; }
+.btn-pwr:hover { filter: brightness(1.2); transform: translateY(-2px); }
+.btn-opt { background: var(--surface); color: var(--text); border: 1px solid var(--border); padding: 12px; }
+.btn-opt:hover { border-color: var(--accent); color: var(--accent); }
+.btn-danger { background: transparent; border: 1px solid #f85149; color: #f85149; padding: 10px; margin-top: auto; }
+.btn-danger:hover { background: #f85149; color: #fff; }
+.btn-link { background: transparent; color: var(--muted); margin-top: 15px; }
+
+/* Layout Centering */
+#menu { height: 100vh; display: grid; place-items: center; text-align: center; }
+.pwr-title { font-size: 6rem; font-weight: 800; letter-spacing: -4px; margin-bottom: 2rem; }
+
+.game-area { display: flex; align-items: center; justify-content: center; height: calc(100vh - 70px); gap: 40px; }
+.board-container { display: flex; align-items: center; gap: 20px; }
+#board { display: grid; grid-template-columns: repeat(8, 75px); grid-template-rows: repeat(8, 75px); border: 1px solid var(--border); box-shadow: 0 0 50px rgba(0,0,0,0.5); }
+
+/* Board Details */
+.square { width: 75px; height: 75px; display: grid; place-items: center; font-size: 45px; position: relative; }
+.w-sq { background: #d1d5db; color: #111; }
+.b-sq { background: #6b7280; color: #111; }
+.selected { background: var(--accent) !important; box-shadow: inset 0 0 10px rgba(0,0,0,0.3); }
+.dot { width: 14px; height: 14px; background: rgba(0, 242, 255, 0.4); border-radius: 50%; }
+
+/* UI Components */
+.navbar { display: flex; justify-content: space-between; padding: 15px 50px; background: var(--surface); border-bottom: 1px solid var(--border); }
+.dock { display: flex; flex-direction: column; width: 40px; height: 600px; gap: 5px; opacity: 0.6; }
+.sidebar { width: 280px; height: 600px; display: flex; flex-direction: column; }
+.panel { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 15px; overflow-y: auto; }
+#history { font-size: 13px; color: var(--muted); line-height: 2; margin-top: 10px; }
+
+/* Modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); display: grid; place-items: center; z-index: 500; }
+.modal-box { background: var(--surface); padding: 40px; border-radius: 12px; width: 320px; text-align: center; border: 1px solid var(--border); }
+.modal-options { display: grid; gap: 10px; margin: 20px 0; }
+
+.hidden { display: none !important; }
