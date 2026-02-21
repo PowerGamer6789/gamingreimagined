@@ -7,59 +7,60 @@
     <link rel="stylesheet" href="./style.css">
 </head>
 <body>
-
     <div id="splash">
-        <img src="./splash.png" alt="pwRChess" id="splash-img">
+        <img src="./splash.png" alt="pwRChess" class="splash-logo">
     </div>
 
-    <div id="menu" class="hidden">
-        <div class="hero">
-            <h1 class="pwr-title">pwRChess</h1>
-            <button class="btn-pwr" onclick="openModal()">Start Game</button>
+    <div id="main-menu" class="hidden">
+        <h1 class="title">pwRChess</h1>
+        <div class="menu-container">
+            <button id="play-btn">PLAY VS BOT</button>
+            <button id="p2-btn">2 PLAYER LOCAL</button>
         </div>
     </div>
 
-    <div id="game" class="hidden">
-        <header class="navbar">
-            <div class="nav-left">
-                <span class="brand">pwRChess</span>
-                <span id="bot-lvl" class="tag">NORMAL</span>
-            </div>
-            <div id="turn-badge" class="status-msg">White to move</div>
-            <div class="nav-right">
-                <span id="user-name" class="user-tag">Guest</span>
-            </div>
-        </header>
+    <div id="popup-overlay" class="hidden">
+        <div class="popup">
+            <h3>Difficulty</h3>
+            <button class="diff-opt" data-depth="1">EASY</button>
+            <button class="diff-opt" data-depth="2">NORMAL</button>
+            <button class="diff-opt" data-depth="3">HARD</button>
+            <button class="diff-opt" data-depth="4">IMPOSSIBLE</button>
+            <button class="cancel-btn" onclick="closePopup()">CANCEL</button>
+        </div>
+    </div>
 
-        <main class="game-area">
-            <div class="board-container">
-                <div id="cap-w" class="dock"></div>
-                <div id="board"></div>
-                <div id="cap-b" class="dock"></div>
-            </div>
-            
-            <aside class="sidebar">
-                <div class="panel">
-                    <h3>Move Log</h3>
-                    <div id="history"></div>
+    <div id="game-view" class="hidden">
+        <div id="winner-overlay" class="hidden">
+            <div class="winner-content">
+                <h1 id="winner-text">WHITE WINS!</h1>
+                <div class="winner-btns">
+                    <button onclick="initGame()">REMATCH</button>
+                    <button class="secondary-btn" onclick="resetToMenu()">EXIT</button>
                 </div>
-                <button class="btn-danger" onclick="location.reload()">Resign</button>
-            </aside>
-        </main>
-    </div>
-
-    <div id="modal" class="modal-overlay hidden">
-        <div class="modal-box">
-            <h2>Difficulty</h2>
-            <div class="modal-options">
-                <button class="btn-opt" onclick="startGame(1, 'Easy')">Easy</button>
-                <button class="btn-opt" onclick="startGame(2, 'Normal')">Normal</button>
-                <button class="btn-opt" onclick="startGame(3, 'Hard')">Hard</button>
             </div>
-            <button class="btn-link" onclick="closeModal()">Back to Menu</button>
+        </div>
+
+        <div class="game-layout">
+            <div id="captured-white" class="graveyard" title="White's losses"></div>
+            
+            <div id="board-container">
+                <div id="board"></div>
+            </div>
+
+            <div id="sidebar">
+                <div id="status">White's Turn</div>
+                <div id="move-log">
+                    <div class="log-header">ACTION LOG</div>
+                    <div id="log-content"></div>
+                </div>
+                <button class="menu-btn" onclick="resetToMenu()">QUIT TO MENU</button>
+            </div>
+
+            <div id="captured-black" class="graveyard" title="Black's losses"></div>
         </div>
     </div>
 
-    <script type="module" src="./script.js"></script>
+    <script src="./game.js"></script>
 </body>
 </html>
