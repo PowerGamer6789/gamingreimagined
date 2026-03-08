@@ -85,22 +85,25 @@
   </style>
 
   <script src="../libs/phaser/phaser-ce-2.16.0.min.js"></script>
-  <script type="text/javascript">
+<script type="text/javascript">
     var arrDomain = location.hostname.split('.');
-    if (arrDomain.length > 2 && !/amazonaws/.test(location.hostname) && !/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/.test(location.hostname)) {
-        arrDomain.shift();
-        document.domain = arrDomain.join('.');
+    if (arrDomain.length > 2) {
+        try {
+            arrDomain.shift();
+            document.domain = arrDomain.join('.');
+        } catch (e) {
+            // If this fails (like on an IP or AWS), we ignore it so the game still starts
+        }
     }
     
     var init = window.parent.window.gameBridge ? window.parent.window.gameBridge.initialized : function () {};
 
     function displayGame() {
       document.getElementById('fullWindowHolder').style.display = 'none';
-      // Ensure flex display is maintained when showing
       document.getElementById('gameContainer').style.display = 'flex'; 
       init();
     }
-  </script>
+</script>
 </head>
 
 <body>

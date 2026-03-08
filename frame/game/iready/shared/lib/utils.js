@@ -5,26 +5,26 @@ var fileLoadErrors = [];
 var initialized = false;
 
 function initCAGame() {
-    // without setting the domain here we will have CORS error when accessing the parents variables
     var arrDomain = location.hostname.split('.');
-    if (arrDomain.length > 2 && !/amazonaws/.test(location.hostname) && !/(?:[0-9]{1,3}\.){3}[0-9]{1,3}/.test(location.hostname)) {
-        arrDomain.shift();
-        document.domain = arrDomain.join('.');
+    if (arrDomain.length > 2) {
+        try {
+            arrDomain.shift();
+            document.domain = arrDomain.join('.');
+        } catch (e) {
+            console.warn("Domain shift failed, but carrying on...");
+        }
     }
 
-    // set retry loader hook
     window.preloader = {};
     var fileCounter = 0;
     var files = ['../shared/lib/phaser.min.js', 'js/main.js'];
     var retries = parent.window.gameBridge ? parent.window.gameBridge.info.numberOfRetries : 1;
-    var retriesRemaining = retries;
 
     var loadNext = function(_retriesRemaining) {
         if(++fileCounter < files.length) {
             loadJS(files[fileCounter], loadNext, _retriesRemaining);
         }
     }
-
     loadJS(files[fileCounter], loadNext, retries);
 }
 
