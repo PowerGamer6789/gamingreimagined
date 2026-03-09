@@ -7,7 +7,7 @@ window.ads = [
   { img: "/ads/thereisnogame.png", href: "/game/?id=6" },
   { img: "/ads/eggycar.png", href: "/game/?id=7" },
   { img: "/ads/bloxorz.png", href: "/game/?id=8" },
-  { img: "/ads/starlight.png", href: "https://starlight.webconstructions.co.uk" },
+  { img: "/ads/starlight.png", href: "https://starlight.thedaedals.com" },
 ];
 
 // shuffle

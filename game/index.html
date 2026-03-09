@@ -22,7 +22,7 @@
 
   <div class="container">
     <div class="game-box">
-      <iframe id="gameframe" allowfullscreen sandbox="allow-scripts allow-same-origin"></iframe>
+      <iframe id="gameframe" allowfullscreen allow="pointer-lock" sandbox="allow-scripts allow-same-origin allow-pointer-lock"></iframe>
       <div class="game-title" id="gameTitle"></div>
       <div class="game-author" id="gameAuthor"></div>
       <a class="close-btn" onclick="closeGame()">X</a>
@@ -59,6 +59,7 @@
       20: "pwRChess",
       21: "Ragdoll Hit",
       22: "The i-Ready Collection",
+      23: "Epstein's Basics"
     };
 
     const authors = {
@@ -84,6 +85,7 @@
       20: "pwR",
       21: "Ericetto",
       22: "Curriculum Associates",
+      23: "BubbleFan"
     };
 
     // IDs that need special iframe paths
