@@ -1,56 +1,50 @@
 const MAGIC_BYTE = "pwR";
 
-/**
- * IMPORT: Streams the file and processes it in chunks to avoid RAM spikes
- */
 async function importGlobalSave(file) {
   if (!file) return;
 
   try {
     const magicLen = MAGIC_BYTE.length;
     
-    // Validate Magic Bytes without loading file into memory
     const header = await file.slice(0, magicLen).text();
     const footer = await file.slice(-magicLen).text();
 
     if (header !== MAGIC_BYTE || footer !== MAGIC_BYTE) {
-      throw new Error("Unauthorized file format.");
+      throw new Error("Unauthorized or invalid file format.");
     }
 
-    // Decompress the stream
-    const decompressedStream = file.slice(magicLen, -magicLen)
+    const compressedPart = file.slice(magicLen, -magicLen);
+
+    const decompressedStream = compressedPart
       .stream()
       .pipeThrough(new DecompressionStream("gzip"));
 
     const response = new Response(decompressedStream);
-    // Note: If the JSON is truly massive (500MB+), 
-    // we use .json() here as it is more memory-efficient than .text()
     const data = await response.json();
 
     if (data.site !== "Gaming Reimagined") throw new Error("Incompatible save source.");
 
-    if (!confirm("Restore progress? This will reload the page.")) return;
+    if (!confirm("Restore progress? This will reload the page and overwrite current data.")) return;
 
-    // Restore LocalStorage
     localStorage.clear();
-    Object.keys(data.local).forEach(k => localStorage.setItem(k, data.local[k]));
+    if (data.local) {
+      Object.keys(data.local).forEach(k => localStorage.setItem(k, data.local[k]));
+    }
 
-    // Restore IndexedDB sequentially
-    for (const dbName in data.idb) {
-      await injectIDB(dbName, data.idb[dbName]);
+    if (data.idb) {
+      for (const dbName in data.idb) {
+        await injectIDB(dbName, data.idb[dbName]);
+      }
     }
 
     alert("Restoration successful!");
     window.location.reload();
   } catch (err) {
-    console.error(err);
+    console.error("Import Error:", err);
     alert("Failed to load: " + err.message);
   }
 }
 
-/**
- * EXPORT: Streams data row-by-row to bypass "Invalid string length" errors
- */
 async function exportGlobalSave() {
   try {
     const backupMetadata = {
@@ -63,10 +57,8 @@ async function exportGlobalSave() {
     const compressionStream = new CompressionStream("gzip");
     const writer = compressionStream.writable.getWriter();
 
-    // Background process: Manual JSON Construction to avoid JSON.stringify limits
     const process = (async () => {
       const meta = JSON.stringify(backupMetadata);
-      // Write meta and start the IDB object
       await writer.write(encoder.encode(meta.slice(0, -1) + ',"idb":{'));
 
       const dbList = window.indexedDB.databases ? await window.indexedDB.databases() : [];
@@ -86,9 +78,8 @@ async function exportGlobalSave() {
       await writer.close();
     })();
 
-    // Collect compressed chunks
     const reader = compressionStream.readable.getReader();
-    const chunks = [encoder.encode(MAGIC_BYTE)]; // Start with Magic Byte
+    const chunks = [encoder.encode(MAGIC_BYTE)];
 
     while (true) {
       const { done, value } = await reader.read();
@@ -96,9 +87,8 @@ async function exportGlobalSave() {
       chunks.push(value);
     }
 
-    chunks.push(encoder.encode(MAGIC_BYTE)); // End with Magic Byte
+    chunks.push(encoder.encode(MAGIC_BYTE));
 
-    // Trigger Download
     const blob = new Blob(chunks, { type: "application/octet-stream" });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -111,14 +101,11 @@ async function exportGlobalSave() {
     await process;
     setTimeout(() => URL.revokeObjectURL(url), 10000);
   } catch (err) {
-    console.error(err);
+    console.error("Export Error:", err);
     alert("Export failed: " + err.message);
   }
 }
 
-/**
- * Helper: Streams IndexedDB content row-by-row
- */
 async function streamIDBStores(dbName, writer, encoder) {
   return new Promise((resolve) => {
     const req = indexedDB.open(dbName);
@@ -158,9 +145,6 @@ async function streamIDBStores(dbName, writer, encoder) {
   });
 }
 
-/**
- * Helper: Injects data back into IDB using batch transactions
- */
 async function injectIDB(name, content) {
   return new Promise((resolve) => {
     const req = indexedDB.open(name);
@@ -181,7 +165,10 @@ async function injectIDB(name, content) {
       stores.forEach(sName => {
         const store = tx.objectStore(sName);
         store.clear();
-        for (let k in content[sName]) store.put(content[sName][k], k);
+        for (let k in content[sName]) {
+          const key = isNaN(k) ? k : Number(k);
+          store.put(content[sName][k], key);
+        }
       });
     };
     req.onerror = () => resolve();
